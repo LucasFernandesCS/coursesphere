@@ -15,6 +15,22 @@ describe("CourseService", () => {
     });
   }
 
+  function futureDate(daysFromNow: number) {
+    const date = new Date();
+    date.setDate(date.getDate() + daysFromNow);
+    date.setHours(0, 0, 0, 0);
+
+    return date;
+  }
+
+  function pastDate(daysAgo: number) {
+    const date = new Date();
+    date.setDate(date.getDate() - daysAgo);
+    date.setHours(0, 0, 0, 0);
+
+    return date;
+  }
+
   it("should create a course", async () => {
     const courseService = new CourseService();
     const user = await createUser();
@@ -22,8 +38,8 @@ describe("CourseService", () => {
     const course = await courseService.create({
       name: "JavaScript Basics",
       description: "A course about JavaScript fundamentals",
-      startDate: new Date("2026-01-01"),
-      endDate: new Date("2026-02-01"),
+      startDate: futureDate(10),
+      endDate: futureDate(40),
       creatorId: user.id,
     });
 
@@ -45,8 +61,8 @@ describe("CourseService", () => {
       courseService.create({
         name: "JS",
         description: "Invalid course",
-        startDate: new Date("2026-01-01"),
-        endDate: new Date("2026-02-01"),
+        startDate: futureDate(10),
+        endDate: futureDate(40),
         creatorId: user.id,
       })
     ).rejects.toBeInstanceOf(AppError);
@@ -60,8 +76,23 @@ describe("CourseService", () => {
       courseService.create({
         name: "JavaScript Basics",
         description: "Invalid date course",
-        startDate: new Date("2026-02-01"),
-        endDate: new Date("2026-01-01"),
+        startDate: futureDate(40),
+        endDate: futureDate(10),
+        creatorId: user.id,
+      })
+    ).rejects.toBeInstanceOf(AppError);
+  });
+
+  it("should not create a course with start date in the past", async () => {
+    const courseService = new CourseService();
+    const user = await createUser();
+
+    await expect(
+      courseService.create({
+        name: "Past Course",
+        description: "Invalid course date",
+        startDate: pastDate(1),
+        endDate: futureDate(10),
         creatorId: user.id,
       })
     ).rejects.toBeInstanceOf(AppError);
@@ -74,16 +105,16 @@ describe("CourseService", () => {
     await courseService.create({
       name: "React Basics",
       description: "A course about React",
-      startDate: new Date("2026-01-01"),
-      endDate: new Date("2026-02-01"),
+      startDate: futureDate(10),
+      endDate: futureDate(40),
       creatorId: user.id,
     });
 
     await courseService.create({
       name: "Node Basics",
       description: "A course about Node",
-      startDate: new Date("2026-03-01"),
-      endDate: new Date("2026-04-01"),
+      startDate: futureDate(50),
+      endDate: futureDate(80),
       creatorId: user.id,
     });
 
@@ -104,8 +135,8 @@ describe("CourseService", () => {
     const createdCourse = await courseService.create({
       name: "TypeScript Basics",
       description: "A course about TypeScript",
-      startDate: new Date("2026-01-01"),
-      endDate: new Date("2026-02-01"),
+      startDate: futureDate(10),
+      endDate: futureDate(40),
       creatorId: user.id,
     });
 
@@ -133,8 +164,8 @@ describe("CourseService", () => {
     const createdCourse = await courseService.create({
       name: "Old Course Name",
       description: "Old description",
-      startDate: new Date("2026-01-01"),
-      endDate: new Date("2026-02-01"),
+      startDate: futureDate(10),
+      endDate: futureDate(40),
       creatorId: user.id,
     });
 
@@ -152,6 +183,45 @@ describe("CourseService", () => {
     );
   });
 
+  it("should not update a course with start date in the past", async () => {
+    const courseService = new CourseService();
+    const user = await createUser();
+
+    const createdCourse = await courseService.create({
+      name: "Future Course",
+      description: "Valid course",
+      startDate: futureDate(10),
+      endDate: futureDate(40),
+      creatorId: user.id,
+    });
+
+    await expect(
+      courseService.update(createdCourse.id, user.id, {
+        startDate: pastDate(1),
+      })
+    ).rejects.toBeInstanceOf(AppError);
+  });
+
+  it("should not update a course with end date before start date", async () => {
+    const courseService = new CourseService();
+    const user = await createUser();
+
+    const createdCourse = await courseService.create({
+      name: "Future Course",
+      description: "Valid course",
+      startDate: futureDate(10),
+      endDate: futureDate(40),
+      creatorId: user.id,
+    });
+
+    await expect(
+      courseService.update(createdCourse.id, user.id, {
+        startDate: futureDate(50),
+        endDate: futureDate(20),
+      })
+    ).rejects.toBeInstanceOf(AppError);
+  });
+
   it("should not update a course when user is not creator", async () => {
     const courseService = new CourseService();
     const creator = await createUser();
@@ -160,8 +230,8 @@ describe("CourseService", () => {
     const createdCourse = await courseService.create({
       name: "Private Course",
       description: "Only creator can update",
-      startDate: new Date("2026-01-01"),
-      endDate: new Date("2026-02-01"),
+      startDate: futureDate(10),
+      endDate: futureDate(40),
       creatorId: creator.id,
     });
 
@@ -179,8 +249,8 @@ describe("CourseService", () => {
     const createdCourse = await courseService.create({
       name: "Course To Delete",
       description: "This course will be deleted",
-      startDate: new Date("2026-01-01"),
-      endDate: new Date("2026-02-01"),
+      startDate: futureDate(10),
+      endDate: futureDate(40),
       creatorId: user.id,
     });
 
@@ -197,8 +267,8 @@ describe("CourseService", () => {
     const createdCourse = await courseService.create({
       name: "Private Course",
       description: "Only creator can delete",
-      startDate: new Date("2026-01-01"),
-      endDate: new Date("2026-02-01"),
+      startDate: futureDate(10),
+      endDate: futureDate(40),
       creatorId: creator.id,
     });
 

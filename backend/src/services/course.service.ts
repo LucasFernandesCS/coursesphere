@@ -80,6 +80,16 @@ export class CourseService {
       throw new AppError("Start date and end date are required", 400);
     }
 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const normalizedStartDate = new Date(startDate);
+    normalizedStartDate.setHours(0, 0, 0, 0);
+
+    if (normalizedStartDate < today) {
+      throw new AppError("Start date must be today or in the future", 400);
+    }
+
     if (endDate < startDate) {
       throw new AppError("End date must be equal to or after start date", 400);
     }

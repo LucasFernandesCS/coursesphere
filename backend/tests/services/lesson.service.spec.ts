@@ -16,14 +16,22 @@ describe("LessonService", () => {
     });
   }
 
+  function futureDate(daysFromNow: number) {
+    const date = new Date();
+    date.setDate(date.getDate() + daysFromNow);
+    date.setHours(0, 0, 0, 0);
+
+    return date;
+  }
+
   async function createCourse(creatorId: string) {
     const courseService = new CourseService();
 
     return courseService.create({
       name: "JavaScript Basics",
       description: "A course about JavaScript",
-      startDate: new Date("2026-01-01"),
-      endDate: new Date("2026-02-01"),
+      startDate: futureDate(10),
+      endDate: futureDate(40),
       creatorId,
     });
   }

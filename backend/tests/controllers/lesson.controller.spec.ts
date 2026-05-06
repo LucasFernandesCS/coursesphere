@@ -18,6 +18,13 @@ async function createAuthenticatedUser() {
   };
 }
 
+function futureDateInput(daysFromNow: number) {
+  const date = new Date();
+  date.setDate(date.getDate() + daysFromNow);
+
+  return date.toISOString().split("T")[0];
+}
+
 async function createCourse(token: string) {
   const response = await request(app)
     .post("/courses")
@@ -25,8 +32,8 @@ async function createCourse(token: string) {
     .send({
       name: "JavaScript Basics",
       description: "A course about JavaScript",
-      startDate: "2026-01-01",
-      endDate: "2026-02-01",
+      startDate: futureDateInput(10),
+      endDate: futureDateInput(40),
     });
 
   return response.body.course;

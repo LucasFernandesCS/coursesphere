@@ -18,6 +18,13 @@ async function createAuthenticatedUser() {
   };
 }
 
+function futureDateInput(daysFromNow: number) {
+  const date = new Date();
+  date.setDate(date.getDate() + daysFromNow);
+
+  return date.toISOString().split("T")[0];
+}
+
 describe("CourseController", () => {
   it("should create a course", async () => {
     const { token, user } = await createAuthenticatedUser();
@@ -28,8 +35,8 @@ describe("CourseController", () => {
       .send({
         name: "JavaScript Basics",
         description: "A course about JavaScript",
-        startDate: "2026-01-01",
-        endDate: "2026-02-01",
+        startDate: futureDateInput(10),
+        endDate: futureDateInput(40),
       });
 
     expect(response.status).toBe(201);
@@ -44,12 +51,14 @@ describe("CourseController", () => {
   });
 
   it("should not create a course without authentication", async () => {
-    const response = await request(app).post("/courses").send({
-      name: "JavaScript Basics",
-      description: "A course about JavaScript",
-      startDate: "2026-01-01",
-      endDate: "2026-02-01",
-    });
+    const response = await request(app)
+      .post("/courses")
+      .send({
+        name: "JavaScript Basics",
+        description: "A course about JavaScript",
+        startDate: futureDateInput(10),
+        endDate: futureDateInput(40),
+      });
 
     expect(response.status).toBe(401);
     expect(response.body.message).toBe("Token not provided");
@@ -58,19 +67,25 @@ describe("CourseController", () => {
   it("should list courses from authenticated user", async () => {
     const { token } = await createAuthenticatedUser();
 
-    await request(app).post("/courses").set("Authorization", `Bearer ${token}`).send({
-      name: "React Basics",
-      description: "A course about React",
-      startDate: "2026-01-01",
-      endDate: "2026-02-01",
-    });
+    await request(app)
+      .post("/courses")
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        name: "React Basics",
+        description: "A course about React",
+        startDate: futureDateInput(10),
+        endDate: futureDateInput(40),
+      });
 
-    await request(app).post("/courses").set("Authorization", `Bearer ${token}`).send({
-      name: "Node Basics",
-      description: "A course about Node",
-      startDate: "2026-03-01",
-      endDate: "2026-04-01",
-    });
+    await request(app)
+      .post("/courses")
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        name: "Node Basics",
+        description: "A course about Node",
+        startDate: futureDateInput(50),
+        endDate: futureDateInput(80),
+      });
 
     const response = await request(app).get("/courses").set("Authorization", `Bearer ${token}`);
 
@@ -87,8 +102,8 @@ describe("CourseController", () => {
       .send({
         name: "TypeScript Basics",
         description: "A course about TypeScript",
-        startDate: "2026-01-01",
-        endDate: "2026-02-01",
+        startDate: futureDateInput(10),
+        endDate: futureDateInput(40),
       });
 
     const response = await request(app)
@@ -113,8 +128,8 @@ describe("CourseController", () => {
       .send({
         name: "Old Course Name",
         description: "Old description",
-        startDate: "2026-01-01",
-        endDate: "2026-02-01",
+        startDate: futureDateInput(10),
+        endDate: futureDateInput(40),
       });
 
     const response = await request(app)
@@ -145,8 +160,8 @@ describe("CourseController", () => {
       .send({
         name: "Private Course",
         description: "Only creator can update",
-        startDate: "2026-01-01",
-        endDate: "2026-02-01",
+        startDate: futureDateInput(10),
+        endDate: futureDateInput(40),
       });
 
     const response = await request(app)
@@ -169,8 +184,8 @@ describe("CourseController", () => {
       .send({
         name: "Course To Delete",
         description: "This course will be deleted",
-        startDate: "2026-01-01",
-        endDate: "2026-02-01",
+        startDate: futureDateInput(10),
+        endDate: futureDateInput(40),
       });
 
     const response = await request(app)

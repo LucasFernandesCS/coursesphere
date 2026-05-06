@@ -3,6 +3,15 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+function futureDate(daysFromNow: number) {
+  const date = new Date();
+
+  date.setDate(date.getDate() + daysFromNow);
+  date.setHours(0, 0, 0, 0);
+
+  return date;
+}
+
 async function main() {
   await prisma.lesson.deleteMany();
   await prisma.course.deleteMany();
@@ -22,8 +31,8 @@ async function main() {
     data: {
       name: "JavaScript Basics",
       description: "A course about JavaScript fundamentals.",
-      startDate: new Date("2026-01-01"),
-      endDate: new Date("2026-02-01"),
+      startDate: futureDate(10),
+      endDate: futureDate(40),
       creatorId: user.id,
     },
   });
@@ -32,8 +41,8 @@ async function main() {
     data: {
       name: "React Fundamentals",
       description: "A practical introduction to React and components.",
-      startDate: new Date("2026-03-01"),
-      endDate: new Date("2026-04-01"),
+      startDate: futureDate(50),
+      endDate: futureDate(80),
       creatorId: user.id,
     },
   });
