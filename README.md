@@ -1,5 +1,7 @@
 # CourseSphere
 
+[![Backend CI](https://github.com/LucasFernandesCS/coursesphere/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/LucasFernandesCS/coursesphere/actions/workflows/backend-ci.yml
+
 CourseSphere é uma aplicação web para gestão colaborativa de cursos online. O projeto possui uma API REST para autenticação, gerenciamento de cursos e gerenciamento de aulas.
 
 A stack escolhida para esta implementação foi Node.js com TypeScript no backend, utilizando Express, Prisma ORM, PostgreSQL e autenticação JWT.
