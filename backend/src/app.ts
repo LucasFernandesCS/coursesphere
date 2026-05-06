@@ -3,6 +3,7 @@ import cors from "cors";
 import { ZodError } from "zod";
 import { authRoutes } from "./routes/auth.routes";
 import { courseRoutes } from "./routes/course.routes";
+import { lessonRoutes } from "./routes/lesson.routes";
 import { errorMiddleware } from "./middlewares/error.middleware";
 
 export const app = express();
@@ -18,6 +19,7 @@ app.get("/", (req, res) => {
 
 app.use("/auth", authRoutes);
 app.use("/courses", courseRoutes);
+app.use(lessonRoutes);
 
 app.use((error: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
   if (error instanceof ZodError) {
