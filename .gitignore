@@ -1,0 +1,13 @@
+cat > .gitignore <<'EOF'
+backend/node_modules
+backend/dist
+backend/.env
+backend/src/generated
+
+frontend/node_modules
+frontend/dist
+frontend/.env
+
+.DS_Store
+npm-debug.log*
+EOF

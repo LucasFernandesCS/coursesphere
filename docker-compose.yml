@@ -1,0 +1,62 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: coursesphere-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: coursesphere
+      POSTGRES_PASSWORD: coursesphere
+      POSTGRES_DB: coursesphere_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - coursesphere_postgres_data:/var/lib/postgresql/data
+    networks:
+      - coursesphere-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: coursesphere-backend
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://coursesphere:coursesphere@postgres:5432/coursesphere_dev?schema=public
+      JWT_SECRET: coursesphere_secret
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    command: sh -c "npx prisma migrate dev && npm run dev"
+    networks:
+      - coursesphere-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: coursesphere-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      VITE_API_URL: http://localhost:3000
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm run dev -- --host 0.0.0.0
+    networks:
+      - coursesphere-network
+
+volumes:
+  coursesphere_postgres_data:
+
+networks:
+  coursesphere-network:
+    driver: bridge
