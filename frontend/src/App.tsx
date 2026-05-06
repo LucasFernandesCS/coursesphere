@@ -4,6 +4,8 @@ import { ProtectedRoute } from "./routes/ProtectedRoute";
 import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
 import { Dashboard } from "./pages/Dashboard";
+import { CourseForm } from "./pages/CourseForm";
+import { CourseDetails } from "./pages/CourseDetails";
 
 export function App() {
   return (
@@ -19,6 +21,22 @@ export function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/courses/new"
+            element={
+              <ProtectedRoute>
+                <CourseForm />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/courses/:id"
+            element={
+              <ProtectedRoute>
+                <CourseDetails />
               </ProtectedRoute>
             }
           />
