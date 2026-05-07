@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { deleteCourse, getCourse } from "../services/courseService";
-import { createLesson, deleteLesson, listLessonsByCourse } from "../services/lessonService";
+import {
+  createLesson,
+  deleteLesson,
+  listLessonsByCourse,
+  updateLesson,
+} from "../services/lessonService";
 import { getGuestInstructor } from "../services/guestInstructorService";
 import type { Course } from "../types/course";
 import type { Lesson, LessonStatus } from "../types/lesson";
@@ -21,6 +26,7 @@ export function CourseDetails() {
   const [title, setTitle] = useState("");
   const [status, setStatus] = useState<LessonStatus>("draft");
   const [videoUrl, setVideoUrl] = useState("");
+  const [editingLessonId, setEditingLessonId] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [creatingLesson, setCreatingLesson] = useState(false);
@@ -84,7 +90,22 @@ export function CourseDetails() {
     };
   }, [id]);
 
-  async function handleCreateLesson(event: FormEvent) {
+  function resetLessonForm() {
+    setEditingLessonId(null);
+    setTitle("");
+    setStatus("draft");
+    setVideoUrl("");
+  }
+
+  function handleEditLesson(lesson: Lesson) {
+    setEditingLessonId(lesson.id);
+    setTitle(lesson.title);
+    setStatus(lesson.status);
+    setVideoUrl(lesson.videoUrl || "");
+    setError("");
+  }
+
+  async function handleSubmitLesson(event: FormEvent) {
     event.preventDefault();
 
     if (!id) {
@@ -100,6 +121,21 @@ export function CourseDetails() {
       setCreatingLesson(true);
       setError("");
 
+      if (editingLessonId) {
+        const updatedLesson = await updateLesson(editingLessonId, {
+          title,
+          status,
+          videoUrl: videoUrl || undefined,
+        });
+
+        setLessons((currentLessons) =>
+          currentLessons.map((lesson) => (lesson.id === editingLessonId ? updatedLesson : lesson))
+        );
+
+        resetLessonForm();
+        return;
+      }
+
       const lesson = await createLesson(id, {
         title,
         status,
@@ -107,11 +143,11 @@ export function CourseDetails() {
       });
 
       setLessons((currentLessons) => [lesson, ...currentLessons]);
-      setTitle("");
-      setStatus("draft");
-      setVideoUrl("");
+      resetLessonForm();
     } catch {
-      setError("Não foi possível criar a aula.");
+      setError(
+        editingLessonId ? "Não foi possível atualizar a aula." : "Não foi possível criar a aula."
+      );
     } finally {
       setCreatingLesson(false);
     }
@@ -148,6 +184,10 @@ export function CourseDetails() {
       await deleteLesson(lessonId);
 
       setLessons((currentLessons) => currentLessons.filter((lesson) => lesson.id !== lessonId));
+
+      if (editingLessonId === lessonId) {
+        resetLessonForm();
+      }
     } catch {
       setError("Não foi possível excluir a aula.");
     }
@@ -187,6 +227,10 @@ export function CourseDetails() {
           {new Date(course.endDate).toLocaleDateString("pt-BR")}
         </p>
 
+        <Link className="button-link" to={`/courses/${course.id}/edit`}>
+          Editar curso
+        </Link>
+
         <button type="button" onClick={handleDeleteCourse}>
           Excluir curso
         </button>
@@ -217,9 +261,9 @@ export function CourseDetails() {
       </section>
 
       <section>
-        <h2>Criar aula</h2>
+        <h2>{editingLessonId ? "Editar aula" : "Criar aula"}</h2>
 
-        <form onSubmit={handleCreateLesson}>
+        <form onSubmit={handleSubmitLesson}>
           <div>
             <label htmlFor="title">Título</label>
             <input
@@ -255,8 +299,20 @@ export function CourseDetails() {
           </div>
 
           <button type="submit" disabled={creatingLesson}>
-            {creatingLesson ? "Criando..." : "Criar aula"}
+            {creatingLesson
+              ? editingLessonId
+                ? "Salvando..."
+                : "Criando..."
+              : editingLessonId
+                ? "Salvar alterações"
+                : "Criar aula"}
           </button>
+
+          {editingLessonId && (
+            <button type="button" onClick={resetLessonForm}>
+              Cancelar edição
+            </button>
+          )}
         </form>
       </section>
 
@@ -292,6 +348,10 @@ export function CourseDetails() {
                     </a>
                   </p>
                 )}
+
+                <button type="button" onClick={() => handleEditLesson(lesson)}>
+                  Editar aula
+                </button>
 
                 <button type="button" onClick={() => handleDeleteLesson(lesson.id)}>
                   Excluir aula

@@ -40,6 +40,14 @@ export function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/courses/:id/edit"
+            element={
+              <ProtectedRoute>
+                <CourseForm />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
