@@ -33,43 +33,47 @@ export function Login() {
   }
 
   return (
-    <main>
-      <h1>CourseSphere</h1>
-      <h2>Entrar</h2>
+    <main className="auth-page">
+      <section className="auth-card">
+        <h1>CourseSphere</h1>
+        <h2>Entre na sua conta</h2>
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email">E-mail</label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-          />
-        </div>
+        <form className="form" onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="email">E-mail</label>
+            <input
+              className="input"
+              id="email"
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              required
+            />
+          </div>
 
-        <div>
-          <label htmlFor="password">Senha</label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-          />
-        </div>
+          <div className="form-group">
+            <label htmlFor="password">Senha</label>
+            <input
+              className="input"
+              id="password"
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+            />
+          </div>
 
-        {error && <p>{error}</p>}
+          {error && <p className="alert">{error}</p>}
 
-        <button type="submit" disabled={loading}>
-          {loading ? "Entrando..." : "Entrar"}
-        </button>
-      </form>
+          <button className="button" type="submit" disabled={loading}>
+            {loading ? "Entrando..." : "Entrar"}
+          </button>
+        </form>
 
-      <p>
-        Não tem conta? <Link to="/register">Criar conta</Link>
-      </p>
+        <p className="auth-footer">
+          Não tem conta? <Link to="/register">Criar conta</Link>
+        </p>
+      </section>
     </main>
   );
 }

@@ -35,54 +35,59 @@ export function Register() {
   }
 
   return (
-    <main>
-      <h1>CourseSphere</h1>
-      <h2>Criar conta</h2>
+    <main className="auth-page">
+      <section className="auth-card">
+        <h1>CourseSphere</h1>
+        <h2>Crie sua conta</h2>
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="name">Nome</label>
-          <input
-            id="name"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            required
-          />
-        </div>
+        <form className="form" onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="name">Nome</label>
+            <input
+              className="input"
+              id="name"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              required
+            />
+          </div>
 
-        <div>
-          <label htmlFor="email">E-mail</label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-          />
-        </div>
+          <div className="form-group">
+            <label htmlFor="email">E-mail</label>
+            <input
+              className="input"
+              id="email"
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              required
+            />
+          </div>
 
-        <div>
-          <label htmlFor="password">Senha</label>
-          <input
-            id="password"
-            type="password"
-            minLength={6}
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-          />
-        </div>
+          <div className="form-group">
+            <label htmlFor="password">Senha</label>
+            <input
+              className="input"
+              id="password"
+              type="password"
+              minLength={6}
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+            />
+          </div>
 
-        {error && <p>{error}</p>}
+          {error && <p className="alert">{error}</p>}
 
-        <button type="submit" disabled={loading}>
-          {loading ? "Criando..." : "Criar conta"}
-        </button>
-      </form>
+          <button className="button" type="submit" disabled={loading}>
+            {loading ? "Criando..." : "Criar conta"}
+          </button>
+        </form>
 
-      <p>
-        Já tem conta? <Link to="/login">Entrar</Link>
-      </p>
+        <p className="auth-footer">
+          Já tem conta? <Link to="/login">Entrar</Link>
+        </p>
+      </section>
     </main>
   );
 }
