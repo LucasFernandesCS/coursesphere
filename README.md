@@ -2,9 +2,9 @@
 
 [![Backend CI](https://github.com/LucasFernandesCS/coursesphere/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/LucasFernandesCS/coursesphere/actions/workflows/backend-ci.yml)
 
-CourseSphere é uma aplicação web para gestão colaborativa de cursos online. O projeto possui uma API REST para autenticação, gerenciamento de cursos e gerenciamento de aulas.
+CourseSphere é uma aplicação web para gestão colaborativa de cursos online. O projeto possui autenticação, gerenciamento de cursos, gerenciamento de aulas e consumo de API externa para sugestão de instrutor convidado.
 
-A stack escolhida para esta implementação foi Node.js com TypeScript no backend, utilizando Express, Prisma ORM, PostgreSQL e autenticação JWT.
+A stack escolhida para esta implementação foi Node.js com TypeScript no backend, utilizando Express, Prisma ORM, PostgreSQL e autenticação JWT. No frontend, foi utilizado React com TypeScript e Vite.
 
 > A stack sugerida originalmente era Rails + React, porém o backend foi desenvolvido com Node.js + TypeScript por ser uma stack de maior produtividade para esta entrega, mantendo uma arquitetura organizada em camadas, validações, autenticação, testes e regras de negócio bem definidas.
 
@@ -23,16 +23,16 @@ A stack escolhida para esta implementação foi Node.js com TypeScript no backen
 - Zod
 - Vitest
 - Supertest
+- GitHub Actions
 
 ### Frontend
-
-O frontend será desenvolvido com:
 
 - React
 - TypeScript
 - Vite
 - Axios
 - React Router
+- RandomUser API
 
 ## Estrutura do projeto
 
@@ -62,6 +62,20 @@ coursesphere/
     package.json
     tsconfig.json
   frontend/
+    public/
+    src/
+      components/
+      contexts/
+      pages/
+      routes/
+      services/
+      types/
+      App.tsx
+      main.tsx
+    Dockerfile
+    package.json
+    tsconfig.json
+    vite.config.ts
   docker-compose.yml
   README.md
 ```
@@ -87,6 +101,7 @@ Exemplos:
 - Verificar se um e-mail já está cadastrado.
 - Validar se o usuário é criador de um curso.
 - Validar datas de início e fim de um curso.
+- Impedir criação de cursos com data inicial no passado.
 - Validar status de uma aula.
 - Impedir alterações não autorizadas.
 
@@ -107,6 +122,7 @@ ORM utilizado para comunicação com o PostgreSQL.
 - Geração de token JWT.
 - Rota protegida para obter o usuário autenticado.
 - Middleware de autenticação.
+- Proteção de rotas no frontend.
 
 ### Courses
 
@@ -115,7 +131,10 @@ ORM utilizado para comunicação com o PostgreSQL.
 - Buscar curso por ID.
 - Atualizar curso.
 - Excluir curso.
+- Buscar curso por nome no dashboard.
 - Apenas o criador pode atualizar ou excluir um curso.
+- Curso não pode iniciar em data passada.
+- Data de fim deve ser igual ou posterior à data de início.
 
 ### Lessons
 
@@ -124,9 +143,21 @@ ORM utilizado para comunicação com o PostgreSQL.
 - Buscar aula por ID.
 - Atualizar aula.
 - Excluir aula.
+- Filtrar aulas por status no frontend.
 - Apenas o criador do curso pode criar, atualizar ou excluir aulas daquele curso.
 - Validação de status da aula: `draft` ou `published`.
 - Validação de URL de vídeo.
+
+### API externa
+
+O frontend consome a RandomUser API para sugerir um instrutor convidado na página de detalhes do curso.
+
+Dados exibidos:
+
+- Foto
+- Nome
+- E-mail
+- País
 
 ### Testes
 
@@ -136,6 +167,18 @@ Foram implementados testes para:
 - Repositories.
 - Services.
 - Endpoints HTTP.
+
+### CI
+
+O projeto possui GitHub Actions para validação do backend.
+
+O workflow executa:
+
+- Instalação de dependências.
+- Geração do Prisma Client.
+- Execução das migrations.
+- Testes automatizados.
+- Build do backend.
 
 ## Como rodar o projeto
 
@@ -201,6 +244,8 @@ Email: lucas@example.com
 Senha: 123456
 ```
 
+Também cria cursos e aulas com datas futuras relativas à data atual.
+
 ## Rodar o backend localmente
 
 Dentro da pasta `backend`:
@@ -223,7 +268,63 @@ Na raiz do projeto:
 docker compose up --build postgres backend
 ```
 
-## Rodar testes
+## Configuração do frontend
+
+Entre na pasta do frontend:
+
+```bash
+cd frontend
+```
+
+Instale as dependências:
+
+```bash
+npm install
+```
+
+Crie um arquivo `.env` dentro de `frontend`:
+
+```env
+VITE_API_URL=http://localhost:3000
+```
+
+## Rodar o frontend localmente
+
+Dentro da pasta `frontend`:
+
+```bash
+npm run dev
+```
+
+O frontend ficará disponível em:
+
+```txt
+http://localhost:5173
+```
+
+## Fluxo recomendado para desenvolvimento
+
+Em um terminal, suba o banco e o backend:
+
+```bash
+cd coursesphere
+docker compose up --build postgres backend
+```
+
+Em outro terminal, rode o frontend:
+
+```bash
+cd coursesphere/frontend
+npm run dev
+```
+
+Depois acesse:
+
+```txt
+http://localhost:5173
+```
+
+## Rodar testes do backend
 
 Com o banco PostgreSQL rodando, entre na pasta `backend` e execute:
 
@@ -234,6 +335,14 @@ npm run test
 ## Gerar build do backend
 
 Dentro da pasta `backend`:
+
+```bash
+npm run build
+```
+
+## Gerar build do frontend
+
+Dentro da pasta `frontend`:
 
 ```bash
 npm run build
@@ -287,6 +396,32 @@ Popula o banco com dados iniciais:
 
 ```bash
 npm run prisma:seed
+```
+
+## Scripts disponíveis no frontend
+
+Executa o frontend em modo desenvolvimento:
+
+```bash
+npm run dev
+```
+
+Gera build de produção:
+
+```bash
+npm run build
+```
+
+Executa uma prévia local do build:
+
+```bash
+npm run preview
+```
+
+Executa o lint:
+
+```bash
+npm run lint
 ```
 
 ## Rotas da API
@@ -485,6 +620,37 @@ Body:
 DELETE /lessons/:id
 ```
 
+## Telas do frontend
+
+### Login
+
+Permite autenticar o usuário com e-mail e senha.
+
+### Registro
+
+Permite criar uma nova conta.
+
+### Dashboard
+
+Exibe os cursos do usuário autenticado e possui busca por nome do curso.
+
+### Criação de curso
+
+Permite criar um novo curso com nome, descrição, data inicial e data final.
+
+### Detalhes do curso
+
+Exibe:
+
+- Nome do curso.
+- Descrição.
+- Datas.
+- Instrutor convidado sugerido via API externa.
+- Lista de aulas.
+- Filtro de aulas por status.
+- Formulário para criar ou editar aulas.
+- Ações para editar ou excluir o curso.
+
 ## Regras de negócio
 
 ### Usuários
@@ -500,6 +666,7 @@ DELETE /lessons/:id
 - Nome é obrigatório.
 - Nome deve ter pelo menos 3 caracteres.
 - Data de início é obrigatória.
+- Data de início deve ser hoje ou uma data futura.
 - Data de fim é obrigatória.
 - Data de fim deve ser igual ou posterior à data de início.
 - Todo curso pertence a um usuário criador.
@@ -541,9 +708,13 @@ Authorization: Bearer SEU_TOKEN
 ## Status atual
 
 - Backend implementado.
+- Frontend implementado.
 - Autenticação implementada.
 - CRUD de cursos implementado.
 - CRUD de aulas implementado.
+- Busca por cursos implementada.
+- Filtro de aulas por status implementado.
+- Consumo de API externa implementado.
 - Testes automatizados implementados.
 - Seed implementado.
-- Frontend ainda será desenvolvido.
+- CI com GitHub Actions implementado.
