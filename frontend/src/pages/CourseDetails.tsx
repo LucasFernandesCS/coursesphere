@@ -198,150 +198,186 @@ export function CourseDetails() {
 
   if (loading) {
     return (
-      <main>
-        <p>Carregando detalhes do curso...</p>
+      <main className="page">
+        <section className="card">
+          <p className="meta">Carregando detalhes do curso...</p>
+        </section>
       </main>
     );
   }
 
   if (!course) {
     return (
-      <main>
-        <p>Curso não encontrado.</p>
-        <Link to="/dashboard">Voltar para dashboard</Link>
+      <main className="page">
+        <section className="card">
+          <p>Curso não encontrado.</p>
+          <Link className="button button-secondary" to="/dashboard">
+            Voltar para dashboard
+          </Link>
+        </section>
       </main>
     );
   }
 
   return (
-    <main>
-      <header>
-        <Link to="/dashboard">Voltar para dashboard</Link>
+    <main className="page">
+      <header className="page-header">
+        <div>
+          <Link className="button button-ghost" to="/dashboard">
+            Voltar para dashboard
+          </Link>
 
-        <h1>{course.name}</h1>
+          <h1>{course.name}</h1>
 
-        {course.description && <p>{course.description}</p>}
+          {course.description && <p>{course.description}</p>}
 
-        <p>
-          {new Date(course.startDate).toLocaleDateString("pt-BR")} até{" "}
-          {new Date(course.endDate).toLocaleDateString("pt-BR")}
-        </p>
+          <p className="meta">
+            {new Date(course.startDate).toLocaleDateString("pt-BR")} até{" "}
+            {new Date(course.endDate).toLocaleDateString("pt-BR")}
+          </p>
+        </div>
 
-        <Link className="button-link" to={`/courses/${course.id}/edit`}>
-          Editar curso
-        </Link>
+        <div className="header-actions">
+          <Link className="button button-secondary" to={`/courses/${course.id}/edit`}>
+            Editar curso
+          </Link>
 
-        <button type="button" onClick={handleDeleteCourse}>
-          Excluir curso
-        </button>
+          <button className="button button-danger" type="button" onClick={handleDeleteCourse}>
+            Excluir curso
+          </button>
+        </div>
       </header>
 
-      {error && <p>{error}</p>}
+      {error && <p className="alert">{error}</p>}
 
-      <section>
+      <section className="card">
         <h2>Instrutor convidado sugerido</h2>
 
-        {guestInstructorLoading && <p>Carregando instrutor convidado...</p>}
+        {guestInstructorLoading && <p className="meta">Carregando instrutor convidado...</p>}
 
         {!guestInstructorLoading && guestInstructor && (
-          <article>
+          <article className="instructor">
             <img src={guestInstructor.picture} alt={guestInstructor.name} width={96} height={96} />
 
             <div>
               <h3>{guestInstructor.name}</h3>
-              <p>{guestInstructor.email}</p>
-              <p>{guestInstructor.country}</p>
+              <p className="meta">{guestInstructor.email}</p>
+              <p className="meta">{guestInstructor.country}</p>
             </div>
           </article>
         )}
 
         {!guestInstructorLoading && !guestInstructor && (
-          <p>Não foi possível carregar um instrutor convidado.</p>
+          <p className="meta">Não foi possível carregar um instrutor convidado.</p>
         )}
       </section>
 
-      <section>
+      <section className="card">
         <h2>{editingLessonId ? "Editar aula" : "Criar aula"}</h2>
 
-        <form onSubmit={handleSubmitLesson}>
-          <div>
+        <form className="form" onSubmit={handleSubmitLesson}>
+          <div className="form-group">
             <label htmlFor="title">Título</label>
             <input
+              className="input"
               id="title"
               value={title}
               onChange={(event) => setTitle(event.target.value)}
               required
               minLength={3}
+              placeholder="Ex.: Introdução ao conteúdo"
             />
           </div>
 
+          <div className="grid grid-2">
+            <div className="form-group">
+              <label htmlFor="status">Status</label>
+              <select
+                className="select"
+                id="status"
+                value={status}
+                onChange={(event) => setStatus(event.target.value as LessonStatus)}
+              >
+                <option value="draft">Rascunho</option>
+                <option value="published">Publicado</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="videoUrl">URL do vídeo</label>
+              <input
+                className="input"
+                id="videoUrl"
+                type="url"
+                value={videoUrl}
+                onChange={(event) => setVideoUrl(event.target.value)}
+                placeholder="https://example.com/video"
+              />
+            </div>
+          </div>
+
+          <div className="actions">
+            <button className="button" type="submit" disabled={creatingLesson}>
+              {creatingLesson
+                ? editingLessonId
+                  ? "Salvando..."
+                  : "Criando..."
+                : editingLessonId
+                  ? "Salvar alterações"
+                  : "Criar aula"}
+            </button>
+
+            {editingLessonId && (
+              <button className="button button-secondary" type="button" onClick={resetLessonForm}>
+                Cancelar edição
+              </button>
+            )}
+          </div>
+        </form>
+      </section>
+
+      <section className="card">
+        <div className="page-header" style={{ padding: 0, border: 0, boxShadow: "none" }}>
           <div>
-            <label htmlFor="status">Status</label>
+            <h2>Aulas</h2>
+            <p>Gerencie as aulas vinculadas a este curso.</p>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="statusFilter">Filtrar por status</label>
             <select
-              id="status"
-              value={status}
-              onChange={(event) => setStatus(event.target.value as LessonStatus)}
+              className="select"
+              id="statusFilter"
+              value={statusFilter}
+              onChange={(event) => setStatusFilter(event.target.value as StatusFilter)}
             >
+              <option value="all">Todas</option>
               <option value="draft">Rascunho</option>
               <option value="published">Publicado</option>
             </select>
           </div>
-
-          <div>
-            <label htmlFor="videoUrl">URL do vídeo</label>
-            <input
-              id="videoUrl"
-              type="url"
-              value={videoUrl}
-              onChange={(event) => setVideoUrl(event.target.value)}
-              placeholder="https://example.com/video"
-            />
-          </div>
-
-          <button type="submit" disabled={creatingLesson}>
-            {creatingLesson
-              ? editingLessonId
-                ? "Salvando..."
-                : "Criando..."
-              : editingLessonId
-                ? "Salvar alterações"
-                : "Criar aula"}
-          </button>
-
-          {editingLessonId && (
-            <button type="button" onClick={resetLessonForm}>
-              Cancelar edição
-            </button>
-          )}
-        </form>
-      </section>
-
-      <section>
-        <div>
-          <h2>Aulas</h2>
-
-          <select
-            value={statusFilter}
-            onChange={(event) => setStatusFilter(event.target.value as StatusFilter)}
-          >
-            <option value="all">Todas</option>
-            <option value="draft">Rascunho</option>
-            <option value="published">Publicado</option>
-          </select>
         </div>
 
-        {filteredLessons.length === 0 && <p>Nenhuma aula encontrada.</p>}
+        {filteredLessons.length === 0 && (
+          <div className="empty-state">Nenhuma aula encontrada.</div>
+        )}
 
         {filteredLessons.length > 0 && (
-          <ul>
+          <ul className="lesson-list" style={{ marginTop: 20 }}>
             {filteredLessons.map((lesson) => (
-              <li key={lesson.id}>
+              <li className="lesson-item" key={lesson.id}>
                 <h3>{lesson.title}</h3>
 
-                <p>Status: {lesson.status === "draft" ? "Rascunho" : "Publicado"}</p>
+                <span
+                  className={`status ${
+                    lesson.status === "draft" ? "status-draft" : "status-published"
+                  }`}
+                >
+                  {lesson.status === "draft" ? "Rascunho" : "Publicado"}
+                </span>
 
                 {lesson.videoUrl && (
-                  <p>
+                  <p className="meta">
                     Vídeo:{" "}
                     <a href={lesson.videoUrl} target="_blank" rel="noreferrer">
                       {lesson.videoUrl}
@@ -349,13 +385,23 @@ export function CourseDetails() {
                   </p>
                 )}
 
-                <button type="button" onClick={() => handleEditLesson(lesson)}>
-                  Editar aula
-                </button>
+                <div className="actions">
+                  <button
+                    className="button button-secondary"
+                    type="button"
+                    onClick={() => handleEditLesson(lesson)}
+                  >
+                    Editar aula
+                  </button>
 
-                <button type="button" onClick={() => handleDeleteLesson(lesson.id)}>
-                  Excluir aula
-                </button>
+                  <button
+                    className="button button-danger"
+                    type="button"
+                    onClick={() => handleDeleteLesson(lesson.id)}
+                  >
+                    Excluir aula
+                  </button>
+                </div>
               </li>
             ))}
           </ul>

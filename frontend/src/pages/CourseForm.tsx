@@ -125,78 +125,106 @@ export function CourseForm() {
 
   if (loading) {
     return (
-      <main>
-        <p>Carregando curso...</p>
+      <main className="page">
+        <section className="card">
+          <p className="meta">Carregando curso...</p>
+        </section>
       </main>
     );
   }
 
   return (
-    <main>
-      <header>
-        <h1>{isEditing ? "Editar curso" : "Novo curso"}</h1>
-        <Link to={id ? `/courses/${id}` : "/dashboard"}>
-          {id ? "Voltar para detalhes" : "Voltar para dashboard"}
-        </Link>
+    <main className="page">
+      <header className="page-header">
+        <div>
+          <h1>{isEditing ? "Editar curso" : "Novo curso"}</h1>
+          <p>
+            {isEditing
+              ? "Atualize as informações principais do curso."
+              : "Crie um curso e organize suas aulas em seguida."}
+          </p>
+        </div>
+
+        <div className="header-actions">
+          <Link className="button button-secondary" to={id ? `/courses/${id}` : "/dashboard"}>
+            {id ? "Voltar para detalhes" : "Voltar para dashboard"}
+          </Link>
+        </div>
       </header>
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="name">Nome</label>
-          <input
-            id="name"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            required
-            minLength={3}
-          />
-        </div>
+      <section className="card">
+        <form className="form" onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="name">Nome</label>
+            <input
+              className="input"
+              id="name"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              required
+              minLength={3}
+              placeholder="Ex.: Node.js Fundamentals"
+            />
+          </div>
 
-        <div>
-          <label htmlFor="description">Descrição</label>
-          <textarea
-            id="description"
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-          />
-        </div>
+          <div className="form-group">
+            <label htmlFor="description">Descrição</label>
+            <textarea
+              className="textarea"
+              id="description"
+              value={description}
+              onChange={(event) => setDescription(event.target.value)}
+              placeholder="Descreva brevemente o objetivo do curso"
+            />
+          </div>
 
-        <div>
-          <label htmlFor="startDate">Data de início</label>
-          <input
-            id="startDate"
-            type="date"
-            min={todayInputValue()}
-            value={startDate}
-            onChange={(event) => setStartDate(event.target.value)}
-            required
-          />
-        </div>
+          <div className="grid grid-2">
+            <div className="form-group">
+              <label htmlFor="startDate">Data de início</label>
+              <input
+                className="input"
+                id="startDate"
+                type="date"
+                min={todayInputValue()}
+                value={startDate}
+                onChange={(event) => setStartDate(event.target.value)}
+                required
+              />
+            </div>
 
-        <div>
-          <label htmlFor="endDate">Data de fim</label>
-          <input
-            id="endDate"
-            type="date"
-            min={startDate || todayInputValue()}
-            value={endDate}
-            onChange={(event) => setEndDate(event.target.value)}
-            required
-          />
-        </div>
+            <div className="form-group">
+              <label htmlFor="endDate">Data de fim</label>
+              <input
+                className="input"
+                id="endDate"
+                type="date"
+                min={startDate || todayInputValue()}
+                value={endDate}
+                onChange={(event) => setEndDate(event.target.value)}
+                required
+              />
+            </div>
+          </div>
 
-        {error && <p>{error}</p>}
+          {error && <p className="alert">{error}</p>}
 
-        <button type="submit" disabled={submitting}>
-          {submitting
-            ? isEditing
-              ? "Salvando..."
-              : "Criando..."
-            : isEditing
-              ? "Salvar alterações"
-              : "Criar curso"}
-        </button>
-      </form>
+          <div className="actions">
+            <button className="button" type="submit" disabled={submitting}>
+              {submitting
+                ? isEditing
+                  ? "Salvando..."
+                  : "Criando..."
+                : isEditing
+                  ? "Salvar alterações"
+                  : "Criar curso"}
+            </button>
+
+            <Link className="button button-secondary" to={id ? `/courses/${id}` : "/dashboard"}>
+              Cancelar
+            </Link>
+          </div>
+        </form>
+      </section>
     </main>
   );
 }
