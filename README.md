@@ -8,6 +8,48 @@ A stack escolhida para esta implementação foi Node.js com TypeScript no backen
 
 > A stack sugerida originalmente era Rails + React, porém o backend foi desenvolvido com Node.js + TypeScript por ser uma stack de maior produtividade para esta entrega, mantendo uma arquitetura organizada em camadas, validações, autenticação, testes e regras de negócio bem definidas.
 
+## Deploy
+
+A aplicação está publicada nos seguintes serviços:
+
+### Frontend
+
+O frontend está publicado na Vercel:
+
+```txt
+https://coursesphere-nine.vercel.app/
+```
+
+### Backend
+
+A API está publicada no Render:
+
+```txt
+https://coursesphere-backend-2tu0.onrender.com
+```
+
+### Health check da API
+
+```http
+GET https://coursesphere-backend-2tu0.onrender.com/
+```
+
+Resposta esperada:
+
+```json
+{
+  "message": "CourseSphere API is running"
+}
+```
+
+### Variável de ambiente do frontend em produção
+
+O frontend em produção utiliza a variável:
+
+```env
+VITE_API_URL=https://coursesphere-backend-2tu0.onrender.com
+```
+
 ## Tecnologias
 
 ### Backend
@@ -24,6 +66,7 @@ A stack escolhida para esta implementação foi Node.js com TypeScript no backen
 - Vitest
 - Supertest
 - GitHub Actions
+- Render
 
 ### Frontend
 
@@ -33,6 +76,7 @@ A stack escolhida para esta implementação foi Node.js com TypeScript no backen
 - Axios
 - React Router
 - RandomUser API
+- Vercel
 
 ## Estrutura do projeto
 
@@ -622,6 +666,10 @@ DELETE /lessons/:id
 
 ## Telas do frontend
 
+### Landing page
+
+Apresenta a proposta do CourseSphere e direciona o usuário para login, cadastro ou dashboard.
+
 ### Login
 
 Permite autenticar o usuário com e-mail e senha.
@@ -637,6 +685,10 @@ Exibe os cursos do usuário autenticado e possui busca por nome do curso.
 ### Criação de curso
 
 Permite criar um novo curso com nome, descrição, data inicial e data final.
+
+### Edição de curso
+
+Permite atualizar nome, descrição, data inicial e data final de um curso existente.
 
 ### Detalhes do curso
 
@@ -684,7 +736,7 @@ Exibe:
 
 ## Testando no Postman
 
-### Login
+### Login local
 
 ```http
 POST http://localhost:3000/auth/login
@@ -699,6 +751,21 @@ Body:
 }
 ```
 
+### Login em produção
+
+```http
+POST https://coursesphere-backend-2tu0.onrender.com/auth/login
+```
+
+Body:
+
+```json
+{
+  "email": "seu-email@example.com",
+  "password": "123456"
+}
+```
+
 Copie o token retornado e utilize nas rotas protegidas com o header:
 
 ```txt
@@ -709,6 +776,8 @@ Authorization: Bearer SEU_TOKEN
 
 - Backend implementado.
 - Frontend implementado.
+- Backend publicado no Render.
+- Frontend publicado na Vercel.
 - Autenticação implementada.
 - CRUD de cursos implementado.
 - CRUD de aulas implementado.
