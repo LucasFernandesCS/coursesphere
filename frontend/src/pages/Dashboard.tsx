@@ -45,52 +45,70 @@ export function Dashboard() {
   );
 
   return (
-    <main>
-      <header>
+    <main className="page">
+      <header className="page-header">
         <div>
           <h1>CourseSphere</h1>
           <p>Bem-vindo, {user?.name}</p>
         </div>
 
-        <button type="button" onClick={logout}>
-          Sair
-        </button>
+        <div className="header-actions">
+          <Link className="button" to="/courses/new">
+            Criar novo curso
+          </Link>
+
+          <button className="button button-secondary" type="button" onClick={logout}>
+            Sair
+          </button>
+        </div>
       </header>
 
-      <section>
-        <div>
-          <h2>Meus cursos</h2>
-
-          <Link to="/courses/new">Criar novo curso</Link>
+      <section className="card">
+        <div className="page-header" style={{ padding: 0, border: 0, boxShadow: "none" }}>
+          <div>
+            <h2>Meus cursos</h2>
+            <p>Gerencie seus cursos e aulas em um só lugar.</p>
+          </div>
         </div>
 
-        <input
-          type="text"
-          placeholder="Buscar curso por nome"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-        />
+        <div className="form-group" style={{ marginTop: 16 }}>
+          <label htmlFor="search">Buscar curso</label>
+          <input
+            id="search"
+            className="input"
+            type="text"
+            placeholder="Digite o nome do curso"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+        </div>
 
-        {loading && <p>Carregando cursos...</p>}
+        {loading && <p className="meta">Carregando cursos...</p>}
 
-        {error && <p>{error}</p>}
+        {error && <p className="alert">{error}</p>}
 
-        {!loading && !error && filteredCourses.length === 0 && <p>Nenhum curso encontrado.</p>}
+        {!loading && !error && filteredCourses.length === 0 && (
+          <div className="empty-state">Nenhum curso encontrado.</div>
+        )}
 
         {!loading && !error && filteredCourses.length > 0 && (
-          <ul>
+          <ul className="course-list" style={{ marginTop: 20 }}>
             {filteredCourses.map((course) => (
-              <li key={course.id}>
+              <li className="course-item" key={course.id}>
                 <h3>{course.name}</h3>
 
                 {course.description && <p>{course.description}</p>}
 
-                <p>
+                <p className="meta">
                   {new Date(course.startDate).toLocaleDateString("pt-BR")} até{" "}
                   {new Date(course.endDate).toLocaleDateString("pt-BR")}
                 </p>
 
-                <Link to={`/courses/${course.id}`}>Ver detalhes</Link>
+                <div>
+                  <Link className="button button-secondary" to={`/courses/${course.id}`}>
+                    Ver detalhes
+                  </Link>
+                </div>
               </li>
             ))}
           </ul>
