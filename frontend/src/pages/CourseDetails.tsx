@@ -3,8 +3,10 @@ import type { FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { deleteCourse, getCourse } from "../services/courseService";
 import { createLesson, deleteLesson, listLessonsByCourse } from "../services/lessonService";
+import { getGuestInstructor } from "../services/guestInstructorService";
 import type { Course } from "../types/course";
 import type { Lesson, LessonStatus } from "../types/lesson";
+import type { GuestInstructor } from "../types/guestInstructor";
 
 type StatusFilter = "all" | LessonStatus;
 
@@ -23,6 +25,9 @@ export function CourseDetails() {
   const [loading, setLoading] = useState(true);
   const [creatingLesson, setCreatingLesson] = useState(false);
   const [error, setError] = useState("");
+
+  const [guestInstructor, setGuestInstructor] = useState<GuestInstructor | null>(null);
+  const [guestInstructorLoading, setGuestInstructorLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
@@ -53,7 +58,26 @@ export function CourseDetails() {
       }
     }
 
+    async function loadGuestInstructor() {
+      try {
+        const instructorData = await getGuestInstructor();
+
+        if (isMounted) {
+          setGuestInstructor(instructorData);
+        }
+      } catch {
+        if (isMounted) {
+          setGuestInstructor(null);
+        }
+      } finally {
+        if (isMounted) {
+          setGuestInstructorLoading(false);
+        }
+      }
+    }
+
     loadCourseDetails();
+    loadGuestInstructor();
 
     return () => {
       isMounted = false;
@@ -169,6 +193,28 @@ export function CourseDetails() {
       </header>
 
       {error && <p>{error}</p>}
+
+      <section>
+        <h2>Instrutor convidado sugerido</h2>
+
+        {guestInstructorLoading && <p>Carregando instrutor convidado...</p>}
+
+        {!guestInstructorLoading && guestInstructor && (
+          <article>
+            <img src={guestInstructor.picture} alt={guestInstructor.name} width={96} height={96} />
+
+            <div>
+              <h3>{guestInstructor.name}</h3>
+              <p>{guestInstructor.email}</p>
+              <p>{guestInstructor.country}</p>
+            </div>
+          </article>
+        )}
+
+        {!guestInstructorLoading && !guestInstructor && (
+          <p>Não foi possível carregar um instrutor convidado.</p>
+        )}
+      </section>
 
       <section>
         <h2>Criar aula</h2>
