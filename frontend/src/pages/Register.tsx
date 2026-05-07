@@ -36,6 +36,9 @@ export function Register() {
 
   return (
     <main className="auth-page">
+      <Link className="button button-ghost" to="/">
+        Voltar para início
+      </Link>
       <section className="auth-card">
         <h1>CourseSphere</h1>
         <h2>Crie sua conta</h2>

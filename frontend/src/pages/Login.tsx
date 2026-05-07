@@ -34,6 +34,9 @@ export function Login() {
 
   return (
     <main className="auth-page">
+      <Link className="button button-ghost" to="/">
+        Voltar para início
+      </Link>
       <section className="auth-card">
         <h1>CourseSphere</h1>
         <h2>Entre na sua conta</h2>

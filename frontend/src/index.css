@@ -357,4 +357,45 @@ main {
   .auth-card {
     padding: 24px;
   }
+  .grid-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .home-stat {
+    display: grid;
+    gap: 4px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface-soft);
+  }
+
+  .home-stat strong {
+    color: var(--primary);
+    font-size: 22px;
+    letter-spacing: -0.04em;
+  }
+
+  .home-stat span {
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .feature-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    margin-bottom: 16px;
+    border-radius: 14px;
+    background: #eff6ff;
+    color: var(--primary);
+    font-weight: 900;
+  }
+
+  @media (max-width: 860px) {
+    .grid-3 {
+      grid-template-columns: 1fr;
+    }
+  }
 }
