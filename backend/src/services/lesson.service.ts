@@ -47,14 +47,22 @@ export class LessonService {
     });
   }
 
-  async listByCourse(courseId: string) {
+  async listByCourse(courseId: string, userId: string) {
     const course = await this.courseRepository.findById(courseId);
 
     if (!course) {
       throw new AppError("Course not found", 404);
     }
 
-    return this.lessonRepository.findManyByCourseId(courseId);
+    const isCourseCreator = course.creatorId === userId;
+
+    if (isCourseCreator) {
+      return this.lessonRepository.findManyByCourseId(courseId);
+    }
+
+    return this.lessonRepository.findManyByCourseId(courseId, {
+      status: "published",
+    });
   }
 
   async getById(id: string) {

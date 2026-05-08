@@ -146,7 +146,7 @@ describe("LessonService", () => {
       userId: user.id,
     });
 
-    const lessons = await lessonService.listByCourse(course.id);
+    const lessons = await lessonService.listByCourse(course.id, user.id);
 
     expect(lessons).toHaveLength(2);
     expect(lessons[0]).toEqual(
@@ -270,6 +270,39 @@ describe("LessonService", () => {
 
     await expect(lessonService.delete(createdLesson.id, anotherUser.id)).rejects.toBeInstanceOf(
       AppError
+    );
+  });
+
+  it("should list only published lessons when user is not course creator", async () => {
+    const lessonService = new LessonService();
+    const creator = await createUser();
+    const anotherUser = await createUser();
+    const course = await createCourse(creator.id);
+
+    await lessonService.create({
+      title: "Draft Lesson",
+      status: "draft",
+      videoUrl: "https://example.com/draft",
+      courseId: course.id,
+      userId: creator.id,
+    });
+
+    await lessonService.create({
+      title: "Published Lesson",
+      status: "published",
+      videoUrl: "https://example.com/published",
+      courseId: course.id,
+      userId: creator.id,
+    });
+
+    const lessons = await lessonService.listByCourse(course.id, anotherUser.id);
+
+    expect(lessons).toHaveLength(1);
+    expect(lessons[0]).toEqual(
+      expect.objectContaining({
+        title: "Published Lesson",
+        status: "published",
+      })
     );
   });
 });

@@ -195,9 +195,6 @@ export function CourseDetails() {
     }
   }
 
-  const filteredLessons =
-    statusFilter === "all" ? lessons : lessons.filter((lesson) => lesson.status === statusFilter);
-
   if (loading) {
     return (
       <main className="page">
@@ -222,6 +219,14 @@ export function CourseDetails() {
   }
 
   const isCourseCreator = course.creatorId === user?.id;
+  const visibleLessons = isCourseCreator
+    ? lessons
+    : lessons.filter((lesson) => lesson.status === "published");
+
+  const filteredLessons =
+    statusFilter === "all"
+      ? visibleLessons
+      : visibleLessons.filter((lesson) => lesson.status === statusFilter);
 
   return (
     <main className="page">
@@ -360,7 +365,9 @@ export function CourseDetails() {
               onChange={(event) => setStatusFilter(event.target.value as StatusFilter)}
             >
               <option value="all">Todas</option>
-              <option value="draft">Rascunho</option>
+
+              {isCourseCreator && <option value="draft">Rascunho</option>}
+
               <option value="published">Publicado</option>
             </select>
           </div>

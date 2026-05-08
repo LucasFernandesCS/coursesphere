@@ -45,7 +45,7 @@ export class LessonController {
 
     const lessonService = new LessonService();
 
-    const lessons = await lessonService.listByCourse(courseId);
+    const lessons = await lessonService.listByCourse(courseId, req.user!.id);
 
     return res.json({
       lessons,

@@ -13,6 +13,9 @@ type UpdateLessonData = {
   videoUrl?: string | null;
 };
 
+type FindManyByCourseIdFilters = {
+  status?: string;
+};
 export class LessonRepository {
   async create(data: CreateLessonData) {
     return prisma.lesson.create({
@@ -29,9 +32,12 @@ export class LessonRepository {
     });
   }
 
-  async findManyByCourseId(courseId: string) {
+  async findManyByCourseId(courseId: string, filters?: FindManyByCourseIdFilters) {
     return prisma.lesson.findMany({
-      where: { courseId },
+      where: {
+        courseId,
+        ...(filters?.status ? { status: filters.status } : {}),
+      },
       orderBy: {
         createdAt: "desc",
       },
