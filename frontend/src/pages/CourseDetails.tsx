@@ -12,12 +12,14 @@ import { getGuestInstructor } from "../services/guestInstructorService";
 import type { Course } from "../types/course";
 import type { Lesson, LessonStatus } from "../types/lesson";
 import type { GuestInstructor } from "../types/guestInstructor";
+import { useAuth } from "../contexts/useAuth";
 
 type StatusFilter = "all" | LessonStatus;
 
 export function CourseDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [course, setCourse] = useState<Course | null>(null);
   const [lessons, setLessons] = useState<Lesson[]>([]);
@@ -219,6 +221,8 @@ export function CourseDetails() {
     );
   }
 
+  const isCourseCreator = course.creatorId === user?.id;
+
   return (
     <main className="page">
       <header className="page-header">
@@ -237,15 +241,17 @@ export function CourseDetails() {
           </p>
         </div>
 
-        <div className="header-actions">
-          <Link className="button button-secondary" to={`/courses/${course.id}/edit`}>
-            Editar curso
-          </Link>
+        {isCourseCreator && (
+          <div className="header-actions">
+            <Link className="button button-secondary" to={`/courses/${course.id}/edit`}>
+              Editar curso
+            </Link>
 
-          <button className="button button-danger" type="button" onClick={handleDeleteCourse}>
-            Excluir curso
-          </button>
-        </div>
+            <button className="button button-danger" type="button" onClick={handleDeleteCourse}>
+              Excluir curso
+            </button>
+          </div>
+        )}
       </header>
 
       {error && <p className="alert">{error}</p>}
@@ -272,69 +278,71 @@ export function CourseDetails() {
         )}
       </section>
 
-      <section className="card">
-        <h2>{editingLessonId ? "Editar aula" : "Criar aula"}</h2>
+      {isCourseCreator && (
+        <section className="card">
+          <h2>{editingLessonId ? "Editar aula" : "Criar aula"}</h2>
 
-        <form className="form" onSubmit={handleSubmitLesson}>
-          <div className="form-group">
-            <label htmlFor="title">Título</label>
-            <input
-              className="input"
-              id="title"
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
-              required
-              minLength={3}
-              placeholder="Ex.: Introdução ao conteúdo"
-            />
-          </div>
-
-          <div className="grid grid-2">
+          <form className="form" onSubmit={handleSubmitLesson}>
             <div className="form-group">
-              <label htmlFor="status">Status</label>
-              <select
-                className="select"
-                id="status"
-                value={status}
-                onChange={(event) => setStatus(event.target.value as LessonStatus)}
-              >
-                <option value="draft">Rascunho</option>
-                <option value="published">Publicado</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="videoUrl">URL do vídeo</label>
+              <label htmlFor="title">Título</label>
               <input
                 className="input"
-                id="videoUrl"
-                type="url"
-                value={videoUrl}
-                onChange={(event) => setVideoUrl(event.target.value)}
-                placeholder="https://example.com/video"
+                id="title"
+                value={title}
+                onChange={(event) => setTitle(event.target.value)}
+                required
+                minLength={3}
+                placeholder="Ex.: Introdução ao conteúdo"
               />
             </div>
-          </div>
 
-          <div className="actions">
-            <button className="button" type="submit" disabled={creatingLesson}>
-              {creatingLesson
-                ? editingLessonId
-                  ? "Salvando..."
-                  : "Criando..."
-                : editingLessonId
-                  ? "Salvar alterações"
-                  : "Criar aula"}
-            </button>
+            <div className="grid grid-2">
+              <div className="form-group">
+                <label htmlFor="status">Status</label>
+                <select
+                  className="select"
+                  id="status"
+                  value={status}
+                  onChange={(event) => setStatus(event.target.value as LessonStatus)}
+                >
+                  <option value="draft">Rascunho</option>
+                  <option value="published">Publicado</option>
+                </select>
+              </div>
 
-            {editingLessonId && (
-              <button className="button button-secondary" type="button" onClick={resetLessonForm}>
-                Cancelar edição
+              <div className="form-group">
+                <label htmlFor="videoUrl">URL do vídeo</label>
+                <input
+                  className="input"
+                  id="videoUrl"
+                  type="url"
+                  value={videoUrl}
+                  onChange={(event) => setVideoUrl(event.target.value)}
+                  placeholder="https://example.com/video"
+                />
+              </div>
+            </div>
+
+            <div className="actions">
+              <button className="button" type="submit" disabled={creatingLesson}>
+                {creatingLesson
+                  ? editingLessonId
+                    ? "Salvando..."
+                    : "Criando..."
+                  : editingLessonId
+                    ? "Salvar alterações"
+                    : "Criar aula"}
               </button>
-            )}
-          </div>
-        </form>
-      </section>
+
+              {editingLessonId && (
+                <button className="button button-secondary" type="button" onClick={resetLessonForm}>
+                  Cancelar edição
+                </button>
+              )}
+            </div>
+          </form>
+        </section>
+      )}
 
       <section className="card">
         <div className="page-header" style={{ padding: 0, border: 0, boxShadow: "none" }}>
@@ -385,23 +393,25 @@ export function CourseDetails() {
                   </p>
                 )}
 
-                <div className="actions">
-                  <button
-                    className="button button-secondary"
-                    type="button"
-                    onClick={() => handleEditLesson(lesson)}
-                  >
-                    Editar aula
-                  </button>
+                {isCourseCreator && (
+                  <div className="actions">
+                    <button
+                      className="button button-secondary"
+                      type="button"
+                      onClick={() => handleEditLesson(lesson)}
+                    >
+                      Editar aula
+                    </button>
 
-                  <button
-                    className="button button-danger"
-                    type="button"
-                    onClick={() => handleDeleteLesson(lesson.id)}
-                  >
-                    Excluir aula
-                  </button>
-                </div>
+                    <button
+                      className="button button-danger"
+                      type="button"
+                      onClick={() => handleDeleteLesson(lesson.id)}
+                    >
+                      Excluir aula
+                    </button>
+                  </div>
+                )}
               </li>
             ))}
           </ul>

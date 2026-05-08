@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { createCourse, getCourse, updateCourse } from "../services/courseService";
+import { useAuth } from "../contexts/useAuth";
 
 function todayInputValue() {
   return new Date().toISOString().split("T")[0];
@@ -14,6 +15,7 @@ function formatDateInputValue(date: string) {
 export function CourseForm() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
 
   const isEditing = Boolean(id);
 
@@ -22,7 +24,7 @@ export function CourseForm() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  const [loading, setLoading] = useState(isEditing);
+  const [loading, setLoading] = useState(isEditing || authLoading);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -30,12 +32,17 @@ export function CourseForm() {
     let isMounted = true;
 
     async function loadCourse() {
-      if (!id) {
+      if (!id || authLoading) {
         return;
       }
 
       try {
         const course = await getCourse(id);
+
+        if (course.creatorId !== user?.id) {
+          navigate(`/courses/${course.id}`);
+          return;
+        }
 
         if (isMounted) {
           setName(course.name);
@@ -59,7 +66,7 @@ export function CourseForm() {
     return () => {
       isMounted = false;
     };
-  }, [id]);
+  }, [id, navigate, user?.id, authLoading]);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
