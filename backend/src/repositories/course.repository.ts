@@ -46,7 +46,11 @@ export class CourseRepository {
         },
         _count: {
           select: {
-            lessons: true,
+            lessons: {
+              where: {
+                status: "published",
+              },
+            },
           },
         },
       },
@@ -68,7 +72,11 @@ export class CourseRepository {
         },
         _count: {
           select: {
-            lessons: true,
+            lessons: {
+              where: {
+                status: "published",
+              },
+            },
           },
         },
       },

@@ -134,7 +134,7 @@ export function Dashboard() {
 
                 <p className="meta">Criador: {course.creator?.name || "Não informado"}</p>
 
-                <p className="meta">Aulas: {course._count?.lessons ?? 0}</p>
+                <p className="meta">Aulas publicadas: {course._count?.lessons ?? 0}</p>
 
                 <div>
                   <Link className="button button-secondary" to={`/courses/${course.id}`}>
