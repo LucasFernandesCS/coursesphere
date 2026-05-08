@@ -46,6 +46,16 @@ export class CourseController {
     });
   }
 
+  async indexAll(req: Request, res: Response) {
+    const courseService = new CourseService();
+
+    const courses = await courseService.listAll();
+
+    return res.json({
+      courses,
+    });
+  }
+
   async show(req: Request<CourseParams>, res: Response) {
     const { id } = req.params;
 

@@ -251,7 +251,7 @@ export function CourseDetails() {
       {error && <p className="alert">{error}</p>}
 
       <section className="card">
-        <h2>Instrutor convidado sugerido</h2>
+        <h2>Instrutor convidado</h2>
 
         {guestInstructorLoading && <p className="meta">Carregando instrutor convidado...</p>}
 

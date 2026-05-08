@@ -33,7 +33,45 @@ export class CourseRepository {
 
   async findManyByCreatorId(creatorId: string) {
     return prisma.course.findMany({
-      where: { creatorId },
+      where: {
+        creatorId,
+      },
+      include: {
+        creator: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        _count: {
+          select: {
+            lessons: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  }
+
+  async findMany() {
+    return prisma.course.findMany({
+      include: {
+        creator: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        _count: {
+          select: {
+            lessons: true,
+          },
+        },
+      },
       orderBy: {
         createdAt: "desc",
       },

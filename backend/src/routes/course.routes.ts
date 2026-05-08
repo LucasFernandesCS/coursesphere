@@ -9,6 +9,7 @@ const courseController = new CourseController();
 courseRoutes.use(authMiddleware);
 
 courseRoutes.get("/", (req, res) => courseController.index(req, res));
+courseRoutes.get("/all", (req, res) => courseController.indexAll(req, res));
 courseRoutes.post("/", (req, res) => courseController.create(req, res));
 courseRoutes.get("/:id", (req, res) => courseController.show(req, res));
 courseRoutes.patch("/:id", (req, res) => courseController.update(req, res));

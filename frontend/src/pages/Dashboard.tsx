@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/useAuth";
-import { listCourses } from "../services/courseService";
+import { listAllCourses, listCourses } from "../services/courseService";
 import type { Course } from "../types/course";
+
+type CourseView = "mine" | "all";
 
 export function Dashboard() {
   const { user, logout } = useAuth();
 
   const [courses, setCourses] = useState<Course[]>([]);
+  const [view, setView] = useState<CourseView>("mine");
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -17,7 +20,10 @@ export function Dashboard() {
 
     async function loadCourses() {
       try {
-        const data = await listCourses();
+        setLoading(true);
+        setError("");
+
+        const data = view === "mine" ? await listCourses() : await listAllCourses();
 
         if (isMounted) {
           setCourses(data);
@@ -38,7 +44,7 @@ export function Dashboard() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [view]);
 
   const filteredCourses = courses.filter((course) =>
     course.name.toLowerCase().includes(search.toLowerCase())
@@ -66,8 +72,30 @@ export function Dashboard() {
       <section className="card">
         <div className="page-header" style={{ padding: 0, border: 0, boxShadow: "none" }}>
           <div>
-            <h2>Meus cursos</h2>
-            <p>Gerencie seus cursos e aulas em um só lugar.</p>
+            <h2>{view === "mine" ? "Meus cursos" : "Todos os cursos"}</h2>
+            <p>
+              {view === "mine"
+                ? "Gerencie os cursos criados por você."
+                : "Explore todos os cursos cadastrados na plataforma."}
+            </p>
+          </div>
+
+          <div className="header-actions">
+            <button
+              className={`button ${view === "mine" ? "" : "button-secondary"}`}
+              type="button"
+              onClick={() => setView("mine")}
+            >
+              Meus cursos
+            </button>
+
+            <button
+              className={`button ${view === "all" ? "" : "button-secondary"}`}
+              type="button"
+              onClick={() => setView("all")}
+            >
+              Todos os cursos
+            </button>
           </div>
         </div>
 
@@ -103,6 +131,10 @@ export function Dashboard() {
                   {new Date(course.startDate).toLocaleDateString("pt-BR")} até{" "}
                   {new Date(course.endDate).toLocaleDateString("pt-BR")}
                 </p>
+
+                <p className="meta">Criador: {course.creator?.name || "Não informado"}</p>
+
+                <p className="meta">Aulas: {course._count?.lessons ?? 0}</p>
 
                 <div>
                   <Link className="button button-secondary" to={`/courses/${course.id}`}>

@@ -24,6 +24,12 @@ export async function listCourses() {
   return response.data.courses;
 }
 
+export async function listAllCourses() {
+  const response = await api.get<CoursesResponse>("/courses/all");
+
+  return response.data.courses;
+}
+
 export async function getCourse(id: string) {
   const response = await api.get<CourseResponse>(`/courses/${id}`);
 

@@ -30,6 +30,10 @@ export class CourseService {
     return this.courseRepository.findManyByCreatorId(creatorId);
   }
 
+  async listAll() {
+    return this.courseRepository.findMany();
+  }
+
   async getById(id: string) {
     const course = await this.courseRepository.findById(id);
 
